@@ -1,0 +1,85 @@
+<group name="purehvnc,malware,">
+  <rule id="100201" level="12">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">(?i)timeout\.exe</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">\/t 5</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">REM\sWait\sfor\sPDF\sto\sopen</field>
+    <description>Possible PureHVNC malware activity: PDF delayed execution with timeout.exe.</description>
+    <mitre>
+      <id>T1059</id>
+    </mitre>
+  </rule>
+
+  <rule id="100202" level="12">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">(?i)powershell\.exe</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">Net.ServicePointManager</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">Net.SecurityProtocolType</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">Invoke-WebRequest\s-Uri</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">DXJS.zip</field>
+    <description>Possible PureHVNC malware activity: Suspicious ZIP file DXJS.zip downloaded from a remote file share.</description>
+    <mitre>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <rule id="100203" level="15">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">(?i)powershell\.exe</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">Expand-Archive</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">\-DestinationPath</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">DXJS.zip</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">\-Force</field>
+    <description>Possible PureHVNC malware activity: Suspicious ZIP file DXJS.zip extracted.</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="100204" level="15">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">(?i)attrib\.exe</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">\+h</field>
+    <description>Possible PureHVNC malware activity: Suspicious folder hiding activity.</description>
+    <mitre>
+      <id>T1564.001</id>
+    </mitre>   
+  </rule>
+
+  <rule id="100205" level="15">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">(?i)AppInstallerPythonRedirector\.exe</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">python\.exe</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">(?i)(money|update|upload|time|kam|moment|info)\.py</field>
+    <description>Possible PureHVNC malware activity: Suspicious Python script executed.</description>
+    <mitre>
+      <id>T1059.006</id>
+    </mitre>    
+  </rule>
+
+  <rule id="100206" level="12">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">(?i)powershell\.exe</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">Net.ServicePointManager</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">Net.SecurityProtocolType</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">Invoke-WebRequest\s-Uri</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">FTSP.zip</field>
+    <description>Possible PureHVNC malware activity: Suspicious ZIP file FTSP.zip downloaded from a remote file share.</description>
+    <mitre>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <rule id="100207" level="15">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">(?i)powershell\.exe</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">Expand-Archive</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">\-DestinationPath</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">FTSP.zip</field>
+    <field name="win.eventdata.CommandLine" type="pcre2">\-Force</field>
+    <description>Possible PureHVNC malware activity: Suspicious ZIP file FTSP.zip extracted.</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+  </rule>
+</group>
