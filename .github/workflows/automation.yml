@@ -32,7 +32,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             echo "Updating rules..." 
-            sudo cp -r ruleset/rules /var/ossec/ruleset/rules/*
+            cp -r ruleset/rules /var/ossec/ruleset/rules/*
             echo "Update completed!"
 
       # Runs a set of commands using the runners shell
