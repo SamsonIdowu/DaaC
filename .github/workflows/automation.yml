@@ -16,31 +16,63 @@ jobs:
     # The type of runner that the job will run on
     runs-on: self-hosted
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      #- name: SSH into SIEM server and Run update entries
-      #  uses: appleboy/ssh-action@v1
-      #  with:
-      #    username: ${{ secrets.USERNAME }}
-      #    password: ${{ secrets.PASSWORD }}
-      #    host: ${{ secrets.SERVER }}
-      #    port: ${{ secrets.PORT }}
-      #    script: |
-      #      echo "Updating rules..." 
-      #      echo '${{ secrets.PASSWORD }}' | sudo -S cp -r ruleset/rules /var/ossec/ruleset/rules/* | true
-      #      echo "Rule update completed!"
-      #      echo '${{ secrets.PASSWORD }}' | sudo -S systemctl restart wazuh-manager | true
-      #      echo SIEM is now ready for use!
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: SCP into SIEM server and Run update entries
+      - name: Detect and archive changed rule files
+        id: package
+        run: |
+          mkdir -p changed
+          
+          # Get list of changed or new files in ruleset/rules/ from the last commit
+          git diff --name-only HEAD~1 HEAD | grep '^ruleset/rules/' || true > changed_files.txt
 
-        env:
+          FILES=$(cat changed_files.txt | wc -l)
+
+          if [ "$FILES" -eq "0" ]; then
+            echo "No changed files to process."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Copy changed files into archive dir
+          while read file; do
+            if [ -f "$file" ]; then
+              mkdir -p changed/$(dirname "$file")
+              cp "$file" changed/"$file"
+            fi
+          done < changed_files.txt
+
+          # Archive and encode
+          tar czf rules-changed.tar.gz -C changed .
+          base64 rules-changed.tar.gz > rules.b64
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Upload and apply changed rule files
+        if: steps.package.outputs.skip == 'false'
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          host: ${{ secrets.SERVER }}
           port: ${{ secrets.PORT }}
-        run: |
-          echo "Updating rules..." 
-          echo '${{ secrets.PASSWORD }}' | sudo -S scp -r -p '${{ secrets.PORT }}' ruleset/rules '${{ secrets.USERNAME }}'@'${{ secrets.SERVER }}':/var/ossec/ruleset/rules/* | true
-          echo "Rule update completed!"
+          script: |
+            echo "Receiving base64 archive from GitHub runner..."
+            cat <<'EOF' > /tmp/rules.b64
+            $(cat rules.b64)
+            EOF
+
+            echo "Decoding and extracting archive..."
+            base64 -d /tmp/rules.b64 > /tmp/rules-changed.tar.gz
+            mkdir -p /tmp/rules-changed
+            tar xzf /tmp/rules-changed.tar.gz -C /tmp/rules-changed
+
+            echo "Copying updated files to Wazuh ruleset..."
+            echo '${{ secrets.PASSWORD }}' | sudo -S cp -r /tmp/rules-changed/* /var/ossec/ruleset/rules/
+
+            echo "Restarting wazuh-manager..."
+            echo '${{ secrets.PASSWORD }}' | sudo -S systemctl restart wazuh-manager
+
+            echo "Cleaning up..."
+            rm -rf /tmp/rules-changed /tmp/rules-changed.tar.gz /tmp/rules.b64
