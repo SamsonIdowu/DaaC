@@ -23,7 +23,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: SSH into SIEM server
+      - name: SSH into SIEM server and Run update entries
         uses: appleboy/ssh-action@v1
         with:
           username: ${{ secrets.USERNAME }}
@@ -32,26 +32,6 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             echo "Updating rules..." 
-            cp -r ruleset/rules /var/ossec/ruleset/rules/*
-            echo "Update completed!"
-
-      # Runs a set of commands using the runners shell
-      - name: Update SIEM decoders
-        run: |
-          echo "Updating decoders..." 
-          sudo cp -r ruleset/decoder /var/ossec/ruleset/decoders/*
-          echo "Update completed!"
-          
-      # Runs a set of commands using the runners shell
-      - name: Update SIEM rules
-        run: |
-          echo "Updating rules..." 
-          sudo cp -r ruleset/rules /var/ossec/ruleset/rules/*
-          echo "Update completed!"
-          
-      # Runs a set of commands using the runners shell
-      - name: Preparing SIEM for use
-        run: |
-          echo "Restarting SIEM" 
-          sudo systemctl restart wazuh-manager
-          echo "SIEM is now ready for use!"
+            echo "$password" | sudo -S cp -r ruleset/rules /var/ossec/ruleset/rules/*
+            echo "Rule update completed!"
+            echo "$password" | sudo systemctl restart wazuh-manager
