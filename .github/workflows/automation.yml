@@ -34,7 +34,7 @@ jobs:
       #      echo SIEM is now ready for use!
 
       - name: SCP into SIEM server and Run update entries
-        uses: actions/checkout@v3
+
         env:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
