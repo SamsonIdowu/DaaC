@@ -31,7 +31,6 @@ jobs:
           host: ${{ secrets.SERVER }}
           port: ${{ secrets.PORT }}
           script: |
-            sshpass "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "echo 'Connected successfully!' && uname -a"
             echo "Updating rules..." 
             sudo cp -r ruleset/rules /var/ossec/ruleset/rules/*
             echo "Update completed!"
