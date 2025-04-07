@@ -40,7 +40,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           host: ${{ secrets.SERVER }}
           port: ${{ secrets.PORT }}
-          run: |
-            echo "Updating rules..." 
-            echo '${{ secrets.PASSWORD }}' | sudo -S scp -r -p '${{ secrets.PORT }}' ruleset/rules '${{ secrets.USERNAME }}'@'${{ secrets.SERVER }}':/var/ossec/ruleset/rules/* | true
-            echo "Rule update completed!"
+        run: |
+          echo "Updating rules..." 
+          echo '${{ secrets.PASSWORD }}' | sudo -S scp -r -p '${{ secrets.PORT }}' ruleset/rules '${{ secrets.USERNAME }}'@'${{ secrets.SERVER }}':/var/ossec/ruleset/rules/* | true
+          echo "Rule update completed!"
