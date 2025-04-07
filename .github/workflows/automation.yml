@@ -23,18 +23,18 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
       - name: SSH into SIEM server
-        env:
-          SSH_USER: ${{ secrets.USERNAME }}
-          SSH_PASS: ${{ secrets.PASSWORD }}
-          SSH_HOST: ${{ secrets.SERVER }}
-        run: |
-          sshpass "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "echo 'Connected successfully!' && uname -a"
-          echo "Updating rules..." 
-          sudo cp -r ruleset/rules /var/ossec/ruleset/rules/*
-          echo "Update completed!"
+        uses: appleboy/ssh-action@v1
+        with:
+          username: ${{ secrets.USERNAME }}
+          secrets.PASSWORD: ${{ secrets.PASSWORD }}
+          host: ${{ secrets.SERVER }}
+          port: ${{ secrets.PORT }}
+          script: |
+            sshpass "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "echo 'Connected successfully!' && uname -a"
+            echo "Updating rules..." 
+            sudo cp -r ruleset/rules /var/ossec/ruleset/rules/*
+            echo "Update completed!"
 
       # Runs a set of commands using the runners shell
       - name: Update SIEM decoders
