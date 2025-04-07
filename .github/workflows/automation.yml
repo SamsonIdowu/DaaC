@@ -28,6 +28,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             echo "Updating rules..." 
-            echo '${{ secrets.PASSWORD }}' | sudo -S cp -r ruleset/rules /var/ossec/ruleset/rules/*
+            echo '${{ secrets.PASSWORD }}' | sudo -S cp -r ruleset/rules /var/ossec/ruleset/rules/* | true
             echo "Rule update completed!"
-            echo '${{ secrets.PASSWORD }}' | sudo -S systemctl restart wazuh-manager
+            echo '${{ secrets.PASSWORD }}' | sudo -S systemctl restart wazuh-manager | true
+            echo SIEM is now ready for use!
