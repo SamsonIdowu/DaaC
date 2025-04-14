@@ -26,7 +26,7 @@ jobs:
           run: |
             mkdir /tmp/rules_changed
             sudo apt update && sudo apt install rsync | true
-            rsync /ruleset/rules/* /tmp/rules_changed
+            rsync ruleset/rules/* /tmp/rules_changed
 
   
         # Step 3: Upload and apply changed rule files
