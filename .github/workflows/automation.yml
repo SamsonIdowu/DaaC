@@ -23,18 +23,13 @@ jobs:
   
         # Step 2: Detect and create an archive of changed files
         - name: Detect and archive changed rule files
-          id: package
+          id: identify package
           run: |
-            mkdir -p changed
-  
-            # Use find to detect any newly added or modified files in ruleset/rules
-            # We'll compare the modified timestamps and copy only if the file is new or modified
-            find ruleset/rules/ -type f -exec sh -c 'if [ ! -e "/tmp/remote_rules/$(basename {})" ] || [ "$(stat -c %Y {})" -gt "$(stat -c %Y /tmp/remote_rules/$(basename {}))" ]; then cp {} /tmp/remote_rules/; fi' \;
-  
-            # If there are any files to be copied, create a tarball and base64 encode it
-            tar czf rules-changed.tar.gz -C /tmp remote_rules
-            base64 rules-changed.tar.gz > rules.b64
-            echo "skip=false" >> $GITHUB_OUTPUT
+            cd ..
+            mkdir /tmp/rules_changed
+            sudo apt update && sudo apt install rsync | true
+            rsync -au ./ruleset/rules/ /tmp/rules_changed
+
   
         # Step 3: Upload and apply changed rule files
         - name: Upload and apply changed rule files
@@ -46,21 +41,9 @@ jobs:
             password: ${{ secrets.PASSWORD }}
             port: ${{ secrets.PORT }}
             script: |
-              echo "Receiving base64 archive from GitHub runner..."
-              cat <<'EOF' > /tmp/rules.b64
-              $(cat rules.b64)
-              EOF
-  
-              echo "Decoding and extracting archive..."
-              base64 -d /tmp/rules.b64 > /tmp/rules-changed.tar.gz
-              mkdir -p /tmp/rules-changed
-              tar xzf /tmp/rules-changed.tar.gz -C /tmp/rules-changed
   
               echo "Copying updated files to Wazuh ruleset..."
-              echo '${{ secrets.PASSWORD }}' | sudo -S cp -r /tmp/rules-changed/* /var/ossec/ruleset/rules/
+              echo '${{ secrets.PASSWORD }}' | sudo -S cp -r /tmp/rules_changed/* /var/ossec/ruleset/rules/
   
               echo "Restarting wazuh-manager..."
               echo '${{ secrets.PASSWORD }}' | sudo -S systemctl restart wazuh-manager
-  
-              echo "Cleaning up..."
-              rm -rf /tmp/rules-changed /tmp/rules-changed.tar.gz /tmp/rules.b64
