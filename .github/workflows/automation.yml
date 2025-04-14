@@ -23,7 +23,6 @@ jobs:
   
         # Step 2: Detect and create an archive of changed files
         - name: Detect and archive changed rule files
-          id: identify package
           run: |
             cd ..
             mkdir /tmp/rules_changed
