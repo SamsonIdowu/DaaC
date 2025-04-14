@@ -28,10 +28,8 @@ jobs:
             sudo apt update && sudo apt install rsync | true
             rsync ruleset/rules/* /tmp/rules_changed
 
-  
         # Step 3: Upload and apply changed rule files
         - name: Upload and apply changed rule files
-          if: steps.package.outputs.skip == 'false'
           uses: appleboy/ssh-action@v1.0.0
           with:
             host: ${{ secrets.SERVER }}
