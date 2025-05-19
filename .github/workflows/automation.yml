@@ -40,7 +40,8 @@ jobs:
             script: |
   
               echo "Copying updated files to Wazuh ruleset..."
-              echo "Elevating privilege" | sudo su
-              cp -r /tmp/rules_changed/* /var/ossec/ruleset/rules/
-              echo "Restarting wazuh-manager..."
-              systemctl restart wazuh-manager
+              sudo cp -r /tmp/rules_changed/* /var/ossec/ruleset/rules/ | true
+              echo "ruleset updated!!!"
+
+              sudo systemctl restart wazuh-manager | true
+              echo "wazuh-manager service restarted"
