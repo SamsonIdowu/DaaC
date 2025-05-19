@@ -35,7 +35,7 @@ jobs:
           with:
             host: ${{ secrets.SERVER }}
             username: ${{ secrets.USERNAME }}
-            password: ${{ secrets.SSH_KEY }}
+            key: ${{ secrets.SSH_KEY }}
             port: ${{ secrets.PORT }}
             script: |
   
