@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # === Configuration ===
-SOURCE_DIR="ruleset/rules"
-DEST_DIR="ruleset/rule_changes"
+SOURCE_DIR="./rules"
+DEST_DIR="./rule_changes"
 TRACK_FILE="./.last_file_change_sync"
 
 # === Ensure destination exists and is clean ===
