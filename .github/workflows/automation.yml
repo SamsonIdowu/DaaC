@@ -29,13 +29,10 @@ jobs:
             HOST: ${{secrets.SERVER}}
 
           run: |
-<<<<<<< HEAD
             echo "$SSH_KEY" > /tmp/private_key
             chmod 600 /tmp/private_key
+            
             scp -i /tmp/private_key -o StrictHostKeyChecking=no -r /tmp/rules_changed $USERNAME@$HOST:/tmp/
-=======
-            scp -i $SSH_KEY -r /tmp/rules_changed $USERNAME@$HOST:/tmp/
->>>>>>> 1cb8974f2a533b4a9af512b6656e590f0528b19b
 
         # Step 3: Upload and apply changed rule files
         - name: Upload and apply changed rule files
