@@ -26,27 +26,27 @@ jobs:
             HOST: ${{secrets.SERVER}}
 
           run: |
+            chmod +x scripts/file_change.sh
+            .scripts/file_change.sh
+
             echo "$SSH_KEY" > /tmp/private_key
             chmod 600 /tmp/private_key
 
-            scp -i /tmp/private_key -o StrictHostKeyChecking=no -r ruleset/rules $USERNAME@$HOST:/tmp/rules
+            scp -i /tmp/private_key -o StrictHostKeyChecking=no -r ruleset/rule_changes $USERNAME@$HOST:/tmp/rule_changes
 
         # Step 3: Upload and apply the changed rule files
         - name: Upload and apply changed rule files
-          env:
-            SSH_KEY: ${{secrets.SSH_KEY}}
-            USERNAME: ${{secrets.USERNAME}}
-            HOST: ${{secrets.SERVER}}
+          uses: appleboy/ssh-action@v1.0.0
+          with:
+            host: ${{ secrets.SERVER }}
+            username: ${{ secrets.USERNAME }}
+            key: ${{ secrets.SSH_KEY }}
+            port: ${{ secrets.PORT }}
+            script: |
+  
+              echo "Copying updated files to Wazuh ruleset..."
+              sudo cp -r /tmp/rule_changes/* /var/ossec/ruleset/rules/ | true
+              echo "ruleset updated!!!"
 
-          run: |
-            echo "$SSH_KEY" > /tmp/private_key
-            chmod 600 /tmp/private_key
-
-            ssh -i /tmp/private_key -o StrictHostKeyChecking=no $USERNAME@$HOST
-            
-            echo "Copying updated files to Wazuh ruleset..."
-            sudo cp -r /tmp/rules/* /var/ossec/ruleset/rules/ | true
-            echo "ruleset updated!!!"
-
-            sudo systemctl restart wazuh-manager | true
-            echo "wazuh-manager service restarted"
+              sudo systemctl restart wazuh-manager | true
+              echo "wazuh-manager service restarted"
