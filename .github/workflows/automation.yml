@@ -27,7 +27,6 @@ jobs:
 
           run: |
             cd ruleset
-            mkdir ./rule_changes
             chmod +x file_change.sh
             ./file_change.sh
 
@@ -36,7 +35,23 @@ jobs:
 
             scp -i /tmp/private_key -o StrictHostKeyChecking=no -r ruleset/rule_changes $USERNAME@$HOST:/tmp/rule_changes
 
-        # Step 3: Upload and apply the changed rule files
+        # Step3: Commit and push the rule_changes and last_file_change_syn
+        - name: Commit and push rule changes
+          run: |
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+            git add ruleset/rule_changes
+            git add ruleset/.last_file_change_syn
+
+            if git diff --cached --quiet; then
+            echo "No changes to commit."
+            else
+              git commit -m "Update rule_changes and last sync file [skip ci]"
+              git push
+            fi
+        
+        # Step 4: Upload and apply the changed rule files
         - name: Upload and apply changed rule files
           uses: appleboy/ssh-action@v1.0.0
           with:
