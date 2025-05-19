@@ -26,17 +26,23 @@ jobs:
       - name: Detect modified or new rule files
         run: |
           mkdir -p interim_rules
-
-          # Get list of added or modified files in ruleset/rules/
-          git diff --name-status HEAD^ HEAD | grep -E '^(A|M)\s+ruleset/rules/' | cut -f2 | while read file; do
+  
+          echo "Detecting new or modified files under ruleset/rules/"
+          echo "------------------------------------------"
+  
+          # Try regular diff, fallback to full diff if first commit
+          MODIFIED_FILES=$(git diff --name-status HEAD^ HEAD 2>/dev/null || git diff --name-status HEAD)
+  
+          echo "$MODIFIED_FILES" | grep -E '^(A|M)\s+ruleset/rules/' | cut -f2 | while read file; do
             if [ -f "$file" ]; then
-              mkdir -p "interim_rules/$(dirname "$file" | sed 's|ruleset/rules/||')"
-              cp "$file" "interim_rules/$(echo "$file" | sed 's|ruleset/rules/||')"
+              echo "Copying: $file"
+              cp "$file" interim_rules/
             fi
           done
-
-          echo "Interim files:"
-          find interim_rules
+  
+          echo "------------------------------------------"
+          echo "Final list of files in interim_rules/:"
+          ls -lh interim_rules || echo "No files to show"  
 
       - name: SCP changed files to SIEM server
         env:
@@ -59,3 +65,5 @@ jobs:
             echo "ruleset updated!!!"
             sudo systemctl restart wazuh-manager || true
             echo "wazuh-manager service restarted"
+            sudo rm -f /tmp/interim_rules/*
+            echo "cleared /tmp/interim_rules/ directory!"
