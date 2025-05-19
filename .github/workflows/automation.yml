@@ -50,7 +50,7 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           HOST: ${{ secrets.SERVER }}
         run: |
-          scp -i /tmp/private_key -o StrictHostKeyChecking=no -r interim_rules/* $USERNAME@$HOST:/tmp/interim_rules
+          scp -i /tmp/private_key -o StrictHostKeyChecking=no -r interim_rules/* $USERNAME@$HOST:/tmp/interim_rules/
 
       - name: Upload and apply changed rule files
         uses: appleboy/ssh-action@v1.0.0
@@ -111,7 +111,7 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           HOST: ${{ secrets.SERVER }}
         run: |
-          scp -i /tmp/private_key -o StrictHostKeyChecking=no -r interim_decoders/* $USERNAME@$HOST:/tmp/interim_decoders
+          scp -i /tmp/private_key -o StrictHostKeyChecking=no -r interim_decoders/* $USERNAME@$HOST:/tmp/interim_decoders/
 
       - name: Upload and apply changed rule files
         uses: appleboy/ssh-action@v1.0.0
