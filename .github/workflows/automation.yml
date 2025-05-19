@@ -1,7 +1,4 @@
 name: CI
-permissions:
-  contents: write
-
 on:
   push:
     branches: [ "main" ]
@@ -17,48 +14,35 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set Git credentials
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      # 🟢 Step 1: Pull latest .last_file_change_sync so it’s up-to-date
-      - name: Ensure latest sync timestamp is available
-        run: |
-          git pull origin main
-
-      # 🟢 Step 2: Run the sync script
-      - name: Detect changed rule files
+      - name: Set up SSH key
         env:
-          SSH_KEY: ${{secrets.SSH_KEY}}
-          USERNAME: ${{secrets.USERNAME}}
-          HOST: ${{secrets.SERVER}}
-
+          SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          cd ruleset
-          chmod +x file_change.sh
-          ./file_change.sh
-
           echo "$SSH_KEY" > /tmp/private_key
           chmod 600 /tmp/private_key
 
-          scp -i /tmp/private_key -o StrictHostKeyChecking=no -r rule_changes $USERNAME@$HOST:/tmp/rule_changes
-
-      # 🟢 Step 3: Commit and push the updated rule_changes and sync file
-      - name: Commit and push rule changes
+      - name: Detect changed rule files and prepare interim directory
         run: |
-          git add ruleset/rule_changes
-          git add ruleset/.last_file_change_sync
+          mkdir -p interim_rules
 
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "Update rule_changes and last sync file [skip ci]"
-            git pull --rebase origin main
-            git push https://x-access-token:${{ secrets.TOKEN }}@github.com/${{ github.repository }} HEAD:main
-          fi
+          # Get list of newly added or modified files in ruleset/rules/
+          git diff --name-only HEAD~1 HEAD ruleset/rules/ | while read file; do
+            if [ -f "$file" ]; then
+              mkdir -p "interim_rules/$(dirname "$file" | sed 's|ruleset/rules/||')"
+              cp "$file" "interim_rules/$(echo "$file" | sed 's|ruleset/rules/||')"
+            fi
+          done
 
-      # 🟢 Step 4: SSH and apply the updated rules on the remote server
+          echo "Copied modified or added files to interim_rules/"
+
+      - name: SCP changed files to SIEM server
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          USERNAME: ${{ secrets.USERNAME }}
+          HOST: ${{ secrets.SERVER }}
+        run: |
+          scp -i /tmp/private_key -o StrictHostKeyChecking=no -r interim_rules $USERNAME@$HOST:/tmp/interim_rules
+
       - name: Upload and apply changed rule files
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -68,7 +52,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             echo "Copying updated files to Wazuh ruleset..."
-            sudo cp -r /tmp/rule_changes/* /var/ossec/ruleset/rules/ || true
+            sudo cp -r /tmp/interim_rules/* /var/ossec/ruleset/rules/ || true
             echo "ruleset updated!!!"
             sudo systemctl restart wazuh-manager || true
             echo "wazuh-manager service restarted"
