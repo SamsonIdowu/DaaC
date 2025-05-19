@@ -3,3 +3,13 @@
   <regex>[com.apple.securityd:SecServer] \S+ Session \d+ created, uid:(\d+) sessionId:(\d+)</regex>
   <order>uid, sessionId</order>
 </decoder>
+
+<decoder name="example">
+  <program_name>^example</program_name>
+</decoder>
+
+<decoder name="example">
+  <parent>example</parent>
+  <regex>User '(\w+)' logged from '(\d+.\d+.\d+.\d+)'</regex>
+  <order>user, srcip</order>
+</decoder>

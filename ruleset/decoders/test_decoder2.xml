@@ -36,12 +36,6 @@
   <order>subsystem_category,bundle_id,uid</order>
 </decoder>
 
-<decoder name="macOS_loginwindow">
-  <parent>macOS_loginwindow</parent>
-  <regex type="pcre2">\[com\.apple\.loginwindow\.logging:(\w+)\]\s*-\[PersistentAppsSupport saveLogoutPersistentState:finalSnapshot:\]\s*\|\s*previouslyRunningApps:\s*\(\s*{\s*BackgroundState\s*=\s*(\d+);\s*BundleID\s*=\s*"([^"]+)";\s*Hide\s*=\s*\d+;\s*Path\s*=\s*"([^"]+)";\s*</regex>
-  <order>subsystem_category,background_state,bundle_id,path</order>
-</decoder>
-
 <decoder name="macOS_mDNSResponder_child">
   <parent>macOS_mDNSResponder</parent>
   <regex type="pcre2">(?i)(DNSServiceQueryRecord).*mask\.hash: '(\S+)'.*PID\[(\d+)\].(\S+)\)</regex>
