@@ -1,4 +1,6 @@
 name: CI
+permissions:
+  contents: write  # <-- this allows pushing code changes
 on:
   push:
     branches: [ "main" ]
@@ -48,7 +50,7 @@ jobs:
             echo "No changes to commit."
             else
               git commit -m "Update rule_changes and last sync file [skip ci]"
-              git push
+              git push https://x-access-token:${{ secrets.TOKEN }}@github.com/${{ github.repository }} HEAD:main
             fi
         
         # Step 4: Upload and apply the changed rule files
