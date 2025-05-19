@@ -28,6 +28,7 @@ jobs:
             sudo apt update && sudo apt install rsync | true
             rsync ruleset/rules/* /tmp/rules_changed
             ls /tmp/rules_changed
+            scp -i ${{ secrets.SSH_KEY }} -r /tmp/rules_changed ${{ secrets.USERNAME }}@${{ secrets.SERVER }}:/tmp/
 
         # Step 3: Upload and apply changed rule files
         - name: Upload and apply changed rule files
