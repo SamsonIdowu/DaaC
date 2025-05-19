@@ -26,11 +26,9 @@ jobs:
             HOST: ${{secrets.SERVER}}
 
           run: |
-            ls -l
-            ls -l scripts/
-
-            chmod +x /scripts/file_change.sh
-            ./scripts/file_change.sh
+            cd scripts
+            chmod +x file_change.sh
+            .file_change.sh
 
             echo "$SSH_KEY" > /tmp/private_key
             chmod 600 /tmp/private_key
