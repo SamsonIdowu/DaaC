@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  # <-- ensures we get at least 2 commits for comparison
 
       - name: Set up SSH key
         env:
@@ -21,19 +23,20 @@ jobs:
           echo "$SSH_KEY" > /tmp/private_key
           chmod 600 /tmp/private_key
 
-      - name: Detect changed rule files and prepare interim directory
+      - name: Detect modified or new rule files
         run: |
           mkdir -p interim_rules
 
-          # Get list of newly added or modified files in ruleset/rules/
-          git diff --name-only HEAD~1 HEAD ruleset/rules/ | while read file; do
+          # Get list of added or modified files in ruleset/rules/
+          git diff --name-status HEAD^ HEAD | grep -E '^(A|M)\s+ruleset/rules/' | cut -f2 | while read file; do
             if [ -f "$file" ]; then
               mkdir -p "interim_rules/$(dirname "$file" | sed 's|ruleset/rules/||')"
               cp "$file" "interim_rules/$(echo "$file" | sed 's|ruleset/rules/||')"
             fi
           done
 
-          echo "Copied modified or added files to interim_rules/"
+          echo "Interim files:"
+          find interim_rules
 
       - name: SCP changed files to SIEM server
         env:
@@ -41,7 +44,7 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           HOST: ${{ secrets.SERVER }}
         run: |
-          scp -i /tmp/private_key -o StrictHostKeyChecking=no -r interim_rules $USERNAME@$HOST:/tmp/interim_rules
+          scp -i /tmp/private_key -o StrictHostKeyChecking=no -r interim_rules/* $USERNAME@$HOST:/tmp/interim_rules
 
       - name: Upload and apply changed rule files
         uses: appleboy/ssh-action@v1.0.0
