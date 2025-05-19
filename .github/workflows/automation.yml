@@ -126,5 +126,3 @@ jobs:
             echo "decoders updated!!!"
             sudo systemctl restart wazuh-manager || true
             echo "wazuh-manager service restarted"
-            sudo rm -f /tmp/interim_decoders/*
-            echo "cleared /tmp/interim_decoders/ directory!"

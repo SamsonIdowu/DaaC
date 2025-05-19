@@ -6,16 +6,6 @@
   <program_name>^ddaolimaki</program_name>
 </decoder>
 
-<decoder name="macOS_mDNSResponder">
-  <program_name>^mDNSResponder</program_name>
-</decoder>
-
-<decoder name="macOS_launchservicesd_child">
-  <parent>macOS_launchservicesd</parent>
-  <regex type="pcre2">\[com\.apple\.launchservices:(\w+)\]\s*DEATH: Removing app App:"ddaolimaki-daunito"\s*asn:([0-9a-fx-]+)\s*pid:(\d+)</regex>
-  <order>subsystem_category,asn,pid</order>
-</decoder>
-
 <decoder name="macOS_launchservicesd_child">
   <parent>macOS_launchservicesd</parent>
   <regex type="pcre2">\[com\.apple\.launchservices:(\w+)\]\s*ADDING { "CFBundleExecutablePath"="([^"]+)", "CFBundleVersion"=[^,]+, "LSBundlePath"="([^"]+)", "ApplicationType"="(\w+)"[^}]+?"pid"=(\d+), "CFBundleIdentifier"="([^"]+)"</regex>  
