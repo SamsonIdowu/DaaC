@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  DaaC:
+  Rule-Update:
     runs-on: ubuntu-latest
 
     steps:
@@ -67,3 +67,64 @@ jobs:
             echo "wazuh-manager service restarted"
             sudo rm -f /tmp/interim_rules/*
             echo "cleared /tmp/interim_rules/ directory!"
+
+  Decoder-Update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  # <-- ensures we get at least 2 commits for comparison
+
+      - name: Set up SSH key
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          echo "$SSH_KEY" > /tmp/private_key
+          chmod 600 /tmp/private_key
+
+      - name: Detect modified or new decoder files
+        run: |
+          mkdir -p interim_decoders
+  
+          echo "Detecting new or modified files under ruleset/decoders/"
+          echo "------------------------------------------"
+  
+          # Try regular diff, fallback to full diff if first commit
+          MODIFIED_FILES=$(git diff --name-status HEAD^ HEAD 2>/dev/null || git diff --name-status HEAD)
+  
+          echo "$MODIFIED_FILES" | grep -E '^(A|M)\s+ruleset/decoders/' | cut -f2 | while read file; do
+            if [ -f "$file" ]; then
+              echo "Copying: $file"
+              cp "$file" interim_decoders/
+            fi
+          done
+  
+          echo "------------------------------------------"
+          echo "Final list of files in interim_decoders/:"
+          ls interim_decoders || echo "No files to show"  
+
+      - name: SCP changed files to SIEM server
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          USERNAME: ${{ secrets.USERNAME }}
+          HOST: ${{ secrets.SERVER }}
+        run: |
+          scp -i /tmp/private_key -o StrictHostKeyChecking=no -r interim_decoders/* $USERNAME@$HOST:/tmp/interim_decoders
+
+      - name: Upload and apply changed rule files
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            echo "Copying updated files to Wazuh ruleset..."
+            sudo cp -r /tmp/interim_decoders/* /var/ossec/ruleset/decoders/ || true
+            echo "decoders updated!!!"
+            sudo systemctl restart wazuh-manager || true
+            echo "wazuh-manager service restarted"
+            sudo rm -f /tmp/interim_decoders/*
+            echo "cleared /tmp/interim_decoders/ directory!"
