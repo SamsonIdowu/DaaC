@@ -28,7 +28,7 @@ jobs:
           run: |
             cd scripts
             chmod +x file_change.sh
-            .file_change.sh
+            ./file_change.sh
 
             echo "$SSH_KEY" > /tmp/private_key
             chmod 600 /tmp/private_key
