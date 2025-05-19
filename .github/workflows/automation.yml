@@ -54,6 +54,7 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "Update rule_changes and last sync file [skip ci]"
+            git pull --rebase origin main
             git push https://x-access-token:${{ secrets.TOKEN }}@github.com/${{ github.repository }} HEAD:main
           fi
 
