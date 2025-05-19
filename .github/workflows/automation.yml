@@ -1,6 +1,7 @@
 name: CI
 permissions:
-  contents: write  # <-- this allows pushing code changes
+  contents: write
+
 on:
   push:
     branches: [ "main" ]
@@ -8,64 +9,65 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-
 jobs:
-
   DaaC:
-    # The runner that the job will run on.
     runs-on: ubuntu-latest
 
     steps:
-        # Step 1: Checkout repository
-        - name: Checkout repository
-          uses: actions/checkout@v3
-  
-        # Step 2: Copy the changed rule file to the SIEM server
-        - name: Detect changed rule files
-          env:
-            SSH_KEY: ${{secrets.SSH_KEY}}
-            USERNAME: ${{secrets.USERNAME}}
-            HOST: ${{secrets.SERVER}}
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-          run: |
-            cd ruleset
-            chmod +x file_change.sh
-            ./file_change.sh
+      - name: Set Git credentials
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-            echo "$SSH_KEY" > /tmp/private_key
-            chmod 600 /tmp/private_key
+      # 🟢 Step 1: Pull latest .last_file_change_sync so it’s up-to-date
+      - name: Ensure latest sync timestamp is available
+        run: |
+          git pull origin main
 
-            scp -i /tmp/private_key -o StrictHostKeyChecking=no -r rule_changes $USERNAME@$HOST:/tmp/rule_changes
+      # 🟢 Step 2: Run the sync script
+      - name: Detect changed rule files
+        env:
+          SSH_KEY: ${{secrets.SSH_KEY}}
+          USERNAME: ${{secrets.USERNAME}}
+          HOST: ${{secrets.SERVER}}
 
-        # Step3: Commit and push the rule_changes and last_file_change_syn
-        - name: Commit and push rule changes
-          run: |
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        run: |
+          cd ruleset
+          chmod +x file_change.sh
+          ./file_change.sh
 
-            git add ruleset/rule_changes
-            git add ruleset/.last_file_change_sync
+          echo "$SSH_KEY" > /tmp/private_key
+          chmod 600 /tmp/private_key
 
-            if git diff --cached --quiet; then
+          scp -i /tmp/private_key -o StrictHostKeyChecking=no -r rule_changes $USERNAME@$HOST:/tmp/rule_changes
+
+      # 🟢 Step 3: Commit and push the updated rule_changes and sync file
+      - name: Commit and push rule changes
+        run: |
+          git add ruleset/rule_changes
+          git add ruleset/.last_file_change_sync
+
+          if git diff --cached --quiet; then
             echo "No changes to commit."
-            else
-              git commit -m "Update rule_changes and last sync file [skip ci]"
-              git push https://x-access-token:${{ secrets.TOKEN }}@github.com/${{ github.repository }} HEAD:main
-            fi
-        
-        # Step 4: Upload and apply the changed rule files
-        - name: Upload and apply changed rule files
-          uses: appleboy/ssh-action@v1.0.0
-          with:
-            host: ${{ secrets.SERVER }}
-            username: ${{ secrets.USERNAME }}
-            key: ${{ secrets.SSH_KEY }}
-            port: ${{ secrets.PORT }}
-            script: |
-  
-              echo "Copying updated files to Wazuh ruleset..."
-              sudo cp -r /tmp/rule_changes/* /var/ossec/ruleset/rules/ | true
-              echo "ruleset updated!!!"
+          else
+            git commit -m "Update rule_changes and last sync file [skip ci]"
+            git push https://x-access-token:${{ secrets.TOKEN }}@github.com/${{ github.repository }} HEAD:main
+          fi
 
-              sudo systemctl restart wazuh-manager | true
-              echo "wazuh-manager service restarted"
+      # 🟢 Step 4: SSH and apply the updated rules on the remote server
+      - name: Upload and apply changed rule files
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            echo "Copying updated files to Wazuh ruleset..."
+            sudo cp -r /tmp/rule_changes/* /var/ossec/ruleset/rules/ || true
+            echo "ruleset updated!!!"
+            sudo systemctl restart wazuh-manager || true
+            echo "wazuh-manager service restarted"
