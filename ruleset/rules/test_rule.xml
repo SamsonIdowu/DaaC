@@ -79,7 +79,7 @@
     <field name="win.eventdata.CommandLine" type="pcre2">\-Force</field>
     <description>Possible PureHVNC malware activity: Suspicious ZIP file FTSP.zip extracted.</description>
     <mitre>
-      <id>T1059.001</id>
+      <id>T1057.001</id>
     </mitre>
   </rule>
 </group>
