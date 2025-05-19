@@ -1,9 +1,3 @@
-<decoder name="macOS_secure">
-  <parent>macOS_secure</parent>
-  <regex>[com.apple.securityd:SecServer] \S+ Session \d+ created, uid:(\d+) sessionId:(\d+)</regex>
-  <order>uid, sessionId</order>
-</decoder>
-
 <decoder name="example">
   <program_name>^example</program_name>
 </decoder>
