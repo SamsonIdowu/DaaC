@@ -23,8 +23,13 @@ jobs:
   
         # Step 2: Detect and create an archive of changed files
         - name: Detect changed rule files
+          env:
+            SSH_KEY: ${{secrets.SSH_KEY}}
+            USERNAME: ${{secrets.USERNAME}}
+            HOST: ${{secrets.SERVER}}
+
           run: |
-            scp -i ${{ secrets.SSH_KEY }} -r ruleset/rules/* ${{ secrets.USERNAME }}@${{ secrets.SERVER }}:/tmp/
+            scp -i $SSH_KEY -o StrictHostKeyChecking=no -r /tmp/rules_changed $USERNAME@$HOST:/tmp/
 
         # Step 3: Upload and apply changed rule files
         - name: Upload and apply changed rule files
