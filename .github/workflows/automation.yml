@@ -40,7 +40,7 @@ jobs:
             script: |
   
               echo "Copying updated files to Wazuh ruleset..."
-              echo '${{ secrets.SSH_KEY }}' | sudo -S cp -r /tmp/rules_changed/* /var/ossec/ruleset/rules/
-  
+              echo "Elevating privilege" | sudo su
+              cp -r /tmp/rules_changed/* /var/ossec/ruleset/rules/
               echo "Restarting wazuh-manager..."
-              echo '${{ secrets.SSH_KEY }}' | sudo -S systemctl restart wazuh-manager
+              systemctl restart wazuh-manager
