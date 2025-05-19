@@ -27,6 +27,7 @@ jobs:
 
           run: |
             cd ruleset
+            mkdir ./rule_changes
             chmod +x file_change.sh
             ./file_change.sh
 
