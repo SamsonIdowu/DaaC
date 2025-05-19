@@ -31,8 +31,8 @@ jobs:
           run: |
             echo "$SSH_KEY" > /tmp/private_key
             chmod 600 /tmp/private_key
-            
-            scp -i /tmp/private_key -o StrictHostKeyChecking=no -r /tmp/rules_changed $USERNAME@$HOST:/tmp/
+
+            scp -i /tmp/private_key -o StrictHostKeyChecking=no -r ruleset/rules/* $USERNAME@$HOST:/tmp/
 
         # Step 3: Upload and apply changed rule files
         - name: Upload and apply changed rule files
