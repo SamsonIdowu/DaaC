@@ -42,7 +42,7 @@ jobs:
   
           echo "------------------------------------------"
           echo "Final list of files in interim_rules/:"
-          ls -lh interim_rules || echo "No files to show"  
+          ls interim_rules || echo "No files to show"  
 
       - name: SCP changed files to SIEM server
         env:
