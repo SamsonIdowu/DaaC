@@ -33,7 +33,7 @@ jobs:
             echo "$SSH_KEY" > /tmp/private_key
             chmod 600 /tmp/private_key
 
-            scp -i /tmp/private_key -o StrictHostKeyChecking=no -r ruleset/rule_changes $USERNAME@$HOST:/tmp/rule_changes
+            scp -i /tmp/private_key -o StrictHostKeyChecking=no -r rule_changes $USERNAME@$HOST:/tmp/rule_changes
 
         # Step3: Commit and push the rule_changes and last_file_change_syn
         - name: Commit and push rule changes
