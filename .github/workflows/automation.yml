@@ -26,6 +26,7 @@ jobs:
             HOST: ${{secrets.SERVER}}
 
           run: |
+            ls -l
             cd scripts
             chmod +x file_change.sh
             ./file_change.sh
