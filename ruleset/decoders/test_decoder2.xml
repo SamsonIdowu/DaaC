@@ -17,9 +17,3 @@
   <regex type="pcre2">\(RunningBoardServices\)\s*\[com\.apple\.runningboard:(\w+)\]\s*Identity resolved as app\<application\.(com\.wails\.ddaolimaki-daunito)\.\d+\.\d+\((\d+)\)\></regex>
   <order>subsystem_category,bundle_id,uid</order>
 </decoder>
-
-<decoder name="macOS_mDNSResponder_child">
-  <parent>macOS_mDNSResponder</parent>
-  <regex type="pcre2">(?i)(DNSServiceQueryRecord).*mask\.hash: '(\S+)'.*PID\[(\d+)\].(\S+)\)</regex>
-  <order>program_type,hash,pid,process_name</order>
-</decoder>

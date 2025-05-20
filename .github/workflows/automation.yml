@@ -63,8 +63,8 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             echo "Copying updated files to Wazuh ruleset..."
-            sudo cp -r /tmp/interim_decoders/* /var/ossec/ruleset/decoders/ || true
-            echo "decoders updated!!!"
+            sudo cp -r /tmp/interim_decoders/* /var/ossec/etc/decoders || true
+            echo "Decoder update added!!!"
             sudo systemctl restart wazuh-manager || true
             echo "wazuh-manager service restarted"
             sudo rm -f /tmp/interim_decoders/*
@@ -125,8 +125,8 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             echo "Copying updated files to Wazuh ruleset..."
-            sudo cp -r /tmp/interim_rules/* /var/ossec/ruleset/rules/ || true
-            echo "ruleset updated!!!"
+            sudo cp -r /tmp/interim_rules/* /var/ossec/etc/rules/ || true
+            echo "Rule update added!!!"
             sudo systemctl restart wazuh-manager || true
             echo "wazuh-manager service restarted"
             sudo rm -f /tmp/interim_rules/*
