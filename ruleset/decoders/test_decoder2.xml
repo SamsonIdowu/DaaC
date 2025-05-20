@@ -6,18 +6,6 @@
   <program_name>^ddaolimaki</program_name>
 </decoder>
 
-<decoder name="macOS_launchservicesd_child">
-  <parent>macOS_launchservicesd</parent>
-  <regex type="pcre2">\[com\.apple\.launchservices:(\w+)\]\s*ADDING { "CFBundleExecutablePath"="([^"]+)", "CFBundleVersion"=[^,]+, "LSBundlePath"="([^"]+)", "ApplicationType"="(\w+)"[^}]+?"pid"=(\d+), "CFBundleIdentifier"="([^"]+)"</regex>  
-  <order>subsystem_category,executable_path,bundle_path,application_type,pid,bundle_id</order>
-</decoder>
-
-<decoder name="macOS_ddaolimaki-daunito_child">
-  <parent>macOS_ddaolimaki-daunito</parent>
-  <regex type="pcre2">\(LaunchServices\)\s*\[com\.apple\.launchservices:(\w+)\]\s*LSApplicationCheckIn\(\)\s*,\s*app\s+being\s+registered\s+is:"([^"]+)"</regex>
-  <order>category,executable_path</order>
-</decoder>
-
 <decoder name="macOS_ddaolimaki-daunito_child">
   <parent>macOS_ddaolimaki-daunito</parent>
   <regex type="pcre2">\(AE\)\s*\[com\.apple\.appleevents:(\w+)\]\s*eEntitlements\s*,\s*token\s*(\d+\/\d+), designatedCodeReq = {[^}]+, "kTCCCodeIdentityCanSendToAnyTarget"=(\w+), "kTCCCodeIdentityCSFlags"=(\d+), "kTCCCodeIdentityDesignatedRequirementData"=\$[A-F0-9]+, "kTCCCodeIdentityExecutableURL"="([^"]+)", "kTCCCodeIdentityIdentifier"="([^"]+)", "kTCCCodeIdentityIdentifierType"=\d+, "kTCCCodeIdentityPlatformType"=\d+, "kTCCCodeIdentityPromptPolicy"=(\d+)</regex>
