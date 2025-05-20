@@ -29,7 +29,7 @@ Follow the below steps on GitHub to prepare GitHub Actions CI for the DaaC repos
 This guides the use of the repository to create new or modify existing rulesets for automated integration with the SIEM.
 
 - ### Creating or Modifying Custom Decoders
-Create new or modify existing custom decoders to the **ruleset** > **decoders** directory on the DaaC repository.
+Create new or modify existing custom decoders in the **ruleset** > **decoders** directory of the DaaC repository.
 
 - ### Creating or Modifying Custom Rules
-Create new or modify existing custom new rules to the **ruleset** > **rules** directory on the DaaC repository.
+Create new or modify existing custom rules in the **ruleset** > **rules** directory of the DaaC repository.
