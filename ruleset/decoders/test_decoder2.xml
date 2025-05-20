@@ -14,12 +14,6 @@
 
 <decoder name="macOS_ddaolimaki_daunito_child">
   <parent>macOS_ddaolimaki-daunito</parent>
-  <regex type="pcre2">\(LaunchServices\)\s*\[com\.apple\.launchservices:(\w+)\]\s*CFDictionaryRef copyApplicationInformationDictionaryGivenASNUsingLocalCache\(LSSharedMemoryPageConstRef, LSASNRef\)\(\), information in shared memory with seed \d+ was still valid, so using cached info {[^}]+?"CFBundleExecutablePath"="([^"]+)"[^}]+?"LSBundlePath"="([^"]+)"[^}]+?"ApplicationType"="(\w+)"[^}]+?"LSASN"=([A-Za-z0-9:.-]+)[^}]+?"LSLaunchedWithLaunchD"=(\w+)</regex>
-  <order>subsystem_category,executable_path,bundle_path,application_type,asn,launched_with_launchd</order>
-</decoder>
-
-<decoder name="macOS_ddaolimaki_daunito_child">
-  <parent>macOS_ddaolimaki-daunito</parent>
   <regex type="pcre2">\(RunningBoardServices\)\s*\[com\.apple\.runningboard:(\w+)\]\s*Identity resolved as app\<application\.(com\.wails\.ddaolimaki-daunito)\.\d+\.\d+\((\d+)\)\></regex>
   <order>subsystem_category,bundle_id,uid</order>
 </decoder>

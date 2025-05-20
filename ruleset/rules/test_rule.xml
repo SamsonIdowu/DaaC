@@ -10,19 +10,6 @@
     </mitre>
   </rule>
 
-  <rule id="100201" level="12">
-    <if_sid>61603</if_sid>
-    <field name="win.eventdata.Image" type="pcre2">(?i)powershell\.exe</field>
-    <field name="win.eventdata.CommandLine" type="pcre2">Net.ServicePointManager</field>
-    <field name="win.eventdata.CommandLine" type="pcre2">Net.SecurityProtocolType</field>
-    <field name="win.eventdata.CommandLine" type="pcre2">Invoke-WebRequest\s-Uri</field>
-    <field name="win.eventdata.CommandLine" type="pcre2">DXJS.zip</field>
-    <description>Possible PureHVNC malware activity: Suspicious ZIP file DXJS.zip downloaded from a remote file share.</description>
-    <mitre>
-      <id>T1105</id>
-    </mitre>
-  </rule>
-
   <rule id="100300" level="15">
     <if_sid>61603</if_sid>
     <field name="win.eventdata.Image" type="pcre2">(?i)powershell\.exe</field>
