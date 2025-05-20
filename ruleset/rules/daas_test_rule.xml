@@ -12,7 +12,7 @@
     <description>Hyper-V: $(win.system.message).</description>
   </rule>
 
-  <rule id="110500" level="10">
+  <rule id="110900" level="10">
     <if_sid>60012</if_sid>
     <field name="win.system.providerName" type="pcre2">^Microsoft-Windows-Hyper-V</field>
     <description>Hyper-V: $(win.system.message).</description>
