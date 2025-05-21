@@ -46,7 +46,7 @@
   </rule>
 
 <!-- Persistence -->
-  <rule id="100105" level="11">
+  <rule id="100109" level="11">
     <decoded_as>macOS_launchservicesd</decoded_as>
     <match type="pcre2">(?i)(?i)"LSBundlePath"="(.*Safari Updater.app)"</match>
     <field name="application_type" type="pcre2">Foreground</field>
