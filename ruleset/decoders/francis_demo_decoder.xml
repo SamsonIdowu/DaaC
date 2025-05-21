@@ -1,0 +1,59 @@
+<decoder name="macOS_launchservicesd">
+  <program_name>^launchservicesd</program_name>
+</decoder>
+
+<decoder name="macOS_ddaolimaki-daunito">
+  <program_name>^ddaolimaki</program_name>
+</decoder>
+
+<decoder name="macOS_mDNSResponder">
+  <program_name>^mDNSResponder</program_name>
+</decoder>
+
+<decoder name="macOS_launchservicesd_child">
+  <parent>macOS_launchservicesd</parent>
+  <regex type="pcre2">\[com\.apple\.launchservices:(\w+)\]\s*DEATH: Removing app App:"ddaolimaki-daunito"\s*asn:([0-9a-fx-]+)\s*pid:(\d+)</regex>
+  <order>subsystem_category,asn,pid</order>
+</decoder>
+
+<decoder name="macOS_launchservicesd_child">
+  <parent>macOS_launchservicesd</parent>
+  <regex type="pcre2">\[com\.apple\.launchservices:(\w+)\]\s*ADDING { "CFBundleExecutablePath"="([^"]+)", "CFBundleVersion"=[^,]+, "LSBundlePath"="([^"]+)", "ApplicationType"="(\w+)"[^}]+?"pid"=(\d+), "CFBundleIdentifier"="([^"]+)"</regex>  
+  <order>subsystem_category,executable_path,bundle_path,application_type,pid,bundle_id</order>
+</decoder>
+
+<decoder name="macOS_ddaolimaki-daunito_child">
+  <parent>macOS_ddaolimaki-daunito</parent>
+  <regex type="pcre2">\(LaunchServices\)\s*\[com\.apple\.launchservices:(\w+)\]\s*LSApplicationCheckIn\(\)\s*,\s*app\s+being\s+registered\s+is:"([^"]+)"</regex>
+  <order>category,executable_path</order>
+</decoder>
+
+<decoder name="macOS_ddaolimaki-daunito_child">
+  <parent>macOS_ddaolimaki-daunito</parent>
+  <regex type="pcre2">\(AE\)\s*\[com\.apple\.appleevents:(\w+)\]\s*eEntitlements\s*,\s*token\s*(\d+\/\d+), designatedCodeReq = {[^}]+, "kTCCCodeIdentityCanSendToAnyTarget"=(\w+), "kTCCCodeIdentityCSFlags"=(\d+), "kTCCCodeIdentityDesignatedRequirementData"=\$[A-F0-9]+, "kTCCCodeIdentityExecutableURL"="([^"]+)", "kTCCCodeIdentityIdentifier"="([^"]+)", "kTCCCodeIdentityIdentifierType"=\d+, "kTCCCodeIdentityPlatformType"=\d+, "kTCCCodeIdentityPromptPolicy"=(\d+)</regex>
+  <order>subsystem_category,token,can_send_to_any_target,cs_flags,executable_url,sender_identity,prompt_policy</order>
+</decoder>
+
+<decoder name="macOS_ddaolimaki_daunito_child">
+  <parent>macOS_ddaolimaki-daunito</parent>
+  <regex type="pcre2">\(LaunchServices\)\s*\[com\.apple\.launchservices:(\w+)\]\s*CFDictionaryRef copyApplicationInformationDictionaryGivenASNUsingLocalCache\(LSSharedMemoryPageConstRef, LSASNRef\)\(\), information in shared memory with seed \d+ was still valid, so using cached info {[^}]+?"CFBundleExecutablePath"="([^"]+)"[^}]+?"LSBundlePath"="([^"]+)"[^}]+?"ApplicationType"="(\w+)"[^}]+?"LSASN"=([A-Za-z0-9:.-]+)[^}]+?"LSLaunchedWithLaunchD"=(\w+)</regex>
+  <order>subsystem_category,executable_path,bundle_path,application_type,asn,launched_with_launchd</order>
+</decoder>
+
+<decoder name="macOS_ddaolimaki_daunito_child">
+  <parent>macOS_ddaolimaki-daunito</parent>
+  <regex type="pcre2">\(RunningBoardServices\)\s*\[com\.apple\.runningboard:(\w+)\]\s*Identity resolved as app\<application\.(com\.wails\.ddaolimaki-daunito)\.\d+\.\d+\((\d+)\)\></regex>
+  <order>subsystem_category,bundle_id,uid</order>
+</decoder>
+
+<decoder name="macOS_loginwindow">
+  <parent>macOS_loginwindow</parent>
+  <regex type="pcre2">\[com\.apple\.loginwindow\.logging:(\w+)\]\s*-\[PersistentAppsSupport saveLogoutPersistentState:finalSnapshot:\]\s*\|\s*previouslyRunningApps:\s*\(\s*{\s*BackgroundState\s*=\s*(\d+);\s*BundleID\s*=\s*"([^"]+)";\s*Hide\s*=\s*\d+;\s*Path\s*=\s*"([^"]+)";\s*</regex>
+  <order>subsystem_category,background_state,bundle_id,path</order>
+</decoder>
+
+<decoder name="macOS_mDNSResponder_child">
+  <parent>macOS_mDNSResponder</parent>
+  <regex type="pcre2">(?i)(DNSServiceQueryRecord).*mask\.hash: '(\S+)'.*PID\[(\d+)\].(\S+)\)</regex>
+  <order>program_type,hash,pid,process_name</order>
+</decoder>
