@@ -1,0 +1,60 @@
+<group name="malware,frigidstealer,">
+
+<!-- Initial execution -->
+  <rule id="100101" level="11">
+    <decoded_as>macOS_ddaolimaki-daunito</decoded_as>
+    <match type="pcre2">(?i)app being registered is:(".*ddaolimaki-daunito")</match>
+    <description>Possible FrigidStealer malware detected at $(executable_path)</description>
+    <mitre>
+      <id>T1204</id>
+    </mitre>
+  </rule>
+
+<!-- DNS query -->
+  <rule id="100102" level="11" frequency="2" ignore="60">
+    <decoded_as>macOS_mDNSResponder</decoded_as>
+    <field name="program_type" type="pcre2">DNSServiceQueryRecord</field>
+    <field name="process_name" type="pcre2">ddaolimaki.*</field>
+    <description>FrigidStealer malware is making a suspicious DNS query to $(hash). Possible data exfiltration to C2 server.</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1041</id>
+      <id>T1071.004</id>
+    </mitre>
+  </rule>
+
+<!-- Data exfiltration -->
+  <rule id="100103" level="11">
+    <decoded_as>macOS_ddaolimaki-daunito</decoded_as>
+    <field name="executable_url" type="pcre2">.*Finder</field>
+    <field name="sender_identity" type="pcre2">.*</field>
+    <description>FrigidStealer malware (ddaolimaki-daunito) is attempting to use Apple Events, potentially for unauthorized inter-process communication or data exfiltration.</description>
+    <mitre>
+      <id>T1543</id>
+      <id>T1055</id>
+      <id>T1559</id>
+    </mitre>
+  </rule>
+
+<!-- Process termination -->
+  <rule id="100104" level="11">
+    <match type="pcre2">(?i)Removed job for.*ddaolimaki.*</match>
+    <description>FrigidStealer malware process terminated after data exfiltration.</description>
+    <mitre>
+      <id>T1489</id>
+    </mitre>
+  </rule>
+
+<!-- Persistence -->
+  <rule id="100105" level="11">
+    <decoded_as>macOS_launchservicesd</decoded_as>
+    <match type="pcre2">(?i)(?i)"LSBundlePath"="(.*Safari Updater.app)"</match>
+    <field name="application_type" type="pcre2">Foreground</field>
+    <field name="bundle_id" type="pcre2">com.wails.ddaolimaki-daunito</field>
+    <description>Possible FrigidStealer malware running in $(application_type)</description>
+    <mitre>
+      <id>T1541</id>
+    </mitre>
+  </rule>
+
+</group>
